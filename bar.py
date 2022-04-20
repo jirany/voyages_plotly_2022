@@ -25,33 +25,65 @@ r=requests.post(url,data,headers=auth_headers)
 j=r.text
 df=pd.read_json(j)
 
-app.layout = html.Div(children=[
-	dcc.Graph(
-		id='voyages-bar-graph',
-		style={height="100%"}
-	),
-	html.Label('X variables'),
-	dcc.Dropdown(
-		id='x_var',
-		options=[{'label':md[i]['flatlabel'],'value':i} for i in bar_x_vars],
-		value=bar_x_vars[0],
-		multi=False
-	),
-		html.Label('Y variables'),
-	dcc.Dropdown(
-		id='y_var',
-		options=[{'label':md[i]['flatlabel'],'value':i} for i in bar_y_abs_vars],
-		value=bar_y_abs_vars[0],
-		multi=False
-	),
-	html.Label('Totals/Sums or Averages'),
-	dcc.RadioItems(
-				id='agg_mode',
-				options=[{'label': i, 'value': i} for i in ['Totals/Sums','Averages']],
-				value='Totals/Sums',
-				labelStyle={'display': 'inline-block'}
-			)
-])
+
+controls=controls=dbc.Card(
+	[dbc.Row(
+		[
+			dbc.Col(
+					html.Div([
+						html.Label('X variables'),
+						dcc.Dropdown(
+							id='x_var',
+							options=[{'label':md[i]['flatlabel'],'value':i} for i in bar_x_vars],
+							value=bar_x_vars[0],
+							multi=False
+						)
+					]),						
+					width=12,xs=12,sm=12,md=12,lg=6
+				),
+				dbc.Col(
+					html.Div([
+						html.Label('Y variables'),
+						dcc.Dropdown(
+							id='y_var',
+							options=[{'label':md[i]['flatlabel'],'value':i} for i in bar_y_abs_vars],
+							value=bar_y_abs_vars[0],
+							multi=False
+						),
+						html.Br(),
+						html.Label('Totals/Sums or Averages'),
+						dcc.RadioItems(
+							id='agg_mode',
+							options=[{'label': i, 'value': i} for i in ['Totals/Sums','Averages']],
+							value='Totals/Sums',
+							labelStyle={'display': 'inline-block'}
+						)
+					]),
+					width=12,xs=12,sm=12,md=12,lg=6
+				)
+		]
+	)]
+)
+
+app.layout =  dbc.Container(
+	[
+		dbc.Row([
+			dbc.Col(
+				html.Div(
+					[controls]
+				)
+			),
+		]),
+		dbc.Row([
+			dbc.Col(
+				html.Div(
+					[dcc.Graph(id='voyages-bar-graph')]
+				),
+			),
+		]),
+	],
+	style={"height": "100vh"},
+)
 
 @app.callback(
 	Output('voyages-bar-graph', 'figure'),
@@ -81,7 +113,8 @@ def update_figure(x_var,y_var,agg_mode):
 	
 	fig.update_layout(
 		xaxis_title='',
-		yaxis_title=''
+		yaxis_title='',
+		height=700
 	)
 
 	return fig

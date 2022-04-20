@@ -81,14 +81,7 @@ def update_figure(agg_mode,x_val,y_val,color_val):
 	
 	figtitle='Stacked %s of:<br>' %agg_mode.lower() + md[y_val]['flatlabel']
 	
-	fig=go.Figure()
-	'''fig.update_layout(
-		xaxis_title=re.sub(" : ","<br>",md[x_val]['flatlabel']),
-		yaxis_title=re.sub(" : ","<br>",md[y_val]['flatlabel']),
-		transition_duration=200,
-		title="Voyages: %s" %(figtitle),
-	)'''
-	
+	fig=go.Figure()	
 	
 	if color_val!="Do Not Group":
 		colors=df[color_val].unique()
@@ -107,9 +100,6 @@ def update_figure(agg_mode,x_val,y_val,color_val):
 				line= {'shape': 'spline'},
 				mode='none')
 			)
-		'''fig.update_layout(
-			legend_title=re.sub(" : ","<br>",md[color_val]['flatlabel'])
-		)'''
 	else:
 		df2=agg_functions(x_val,y_val,agg_mode,df)
 		x_vals=df2[x_val].values
@@ -119,7 +109,9 @@ def update_figure(agg_mode,x_val,y_val,color_val):
 			y=y_vals,
 			fill='tozeroy')
 		)
-		
+	
+	fig.update_layout(height=700)
+	
 	return fig
 
 

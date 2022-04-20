@@ -25,8 +25,6 @@ r=requests.post(url,data,headers=auth_headers)
 j=r.text
 df=pd.read_json(j)
 
-
-
 controls=controls=dbc.Card(
 	[dbc.Row(
 		[
@@ -114,6 +112,7 @@ def update_figure(sector_var,value_var,agg_mode):
 			},
 		hole=.4
 		)
+	fig.update_layout(height=700)
 	fig.update_traces(textposition='inside', textinfo='percent+label')
 
 	return fig
