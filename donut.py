@@ -25,32 +25,68 @@ r=requests.post(url,data,headers=auth_headers)
 j=r.text
 df=pd.read_json(j)
 
-app.layout = html.Div(children=[
-	dcc.Graph(
-		id='voyages-donut-graph'
-	),
-	html.Label('Sectors'),
-	dcc.Dropdown(
-		id='sector_var',
-		options=[{'label':md[i]['flatlabel'],'value':i} for i in donut_name_vars],
-		value=donut_name_vars[0],
-		multi=False
-	),
-		html.Label('Values'),
-	dcc.Dropdown(
-		id='value_var',
-		options=[{'label':md[i]['flatlabel'],'value':i} for i in donut_value_vars],
-		value=donut_value_vars[0],
-		multi=False
-	),
-	html.Label('Totals/Sums or Averages'),
-	dcc.RadioItems(
-				id='agg_mode',
-				options=[{'label': i, 'value': i} for i in ['Totals/Sums','Averages']],
-				value='Totals/Sums',
-				labelStyle={'display': 'inline-block'}
-			)
-])
+
+
+controls=controls=dbc.Card(
+	[dbc.Row(
+		[
+			dbc.Col(
+					html.Div([
+						html.Label('Sectors'),
+						dcc.Dropdown(
+							id='sector_var',
+							options=[{'label':md[i]['flatlabel'],'value':i} for i in donut_name_vars],
+							value=donut_name_vars[0],
+							multi=False
+						),
+					]),
+					width=12,xs=12,sm=12,md=12,lg=6
+				),
+				dbc.Col(
+					html.Div([
+						html.Label('Values'),
+						dcc.Dropdown(
+							id='value_var',
+							options=[{'label':md[i]['flatlabel'],'value':i} for i in donut_value_vars],
+							value=donut_value_vars[0],
+							multi=False
+						),
+						html.Br(),
+						html.Label('Aggregation'),
+						dcc.RadioItems(
+							id='agg_mode',
+							options=[{'label': i, 'value': i} for i in ['Totals/Sums','Averages']],
+							value='Totals/Sums',
+							labelStyle={'display': 'inline-block'}
+						)
+					]),
+					width=12,xs=12,sm=12,md=12,lg=6
+				)
+		]
+	)]
+)
+	
+
+app.layout =  dbc.Container(
+	[
+		dbc.Row([
+			dbc.Col(
+				html.Div(
+					[controls]
+				)
+			),
+		]),
+		dbc.Row([
+			dbc.Col(
+				html.Div(
+					[dcc.Graph(id='voyages-donut-graph')]
+				),
+			),
+		])
+	]
+)
+
+
 
 @app.callback(
 	Output('voyages-donut-graph', 'figure'),
