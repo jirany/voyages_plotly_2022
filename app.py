@@ -28,6 +28,8 @@ def get_df(url,data,headers):
 	gdf=pd.read_json(j)
 	return gdf
 
+global df
+
 app.layout =  dbc.Container(
 	[
 		dcc.Store(id="selected_app_layout_name"),
