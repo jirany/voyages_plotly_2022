@@ -204,4 +204,4 @@ def donut_update_figure(sector_var,value_var,agg_mode):
 	return fig
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
