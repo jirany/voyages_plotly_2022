@@ -22,13 +22,13 @@ registered_apps=[
 ]
 
 
-def get_df(url,data,headers):
+def update_df(url,data,headers):
+	global df
 	r=requests.post(url,data,headers=headers)
 	j=r.text
-	gdf=pd.read_json(j)
-	return gdf
+	df=pd.read_json(j)
 
-global df
+df=update_df(base_url+'voyage/caches',data={'cachename':'voyage_xyscatter'},headers=headers)
 
 app.layout =  dbc.Container(
 	[
@@ -64,7 +64,6 @@ app.layout =  dbc.Container(
     Input('app_selector', 'value')
 )
 def display_page(selected_app_layout_name):
-	
 	if selected_app_layout_name in ['donut_layout','bar_layout']:
 		cachename='voyage_bar_and_donut_charts'
 	elif selected_app_layout_name=='xyscatter_layout':
@@ -73,8 +72,8 @@ def display_page(selected_app_layout_name):
 	data={
 		'cachename':cachename
 	}
-	global df
-	df=get_df(url,data,headers)
+	
+	update_df(url,data,headers)
 	
 	return(selected_app_layout_name)
 
