@@ -9,6 +9,8 @@ import requests
 import json
 from app_secrets import *
 
+print("--------",headers,"---------")
+
 r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
 md=json.loads(r.text)
 
@@ -202,4 +204,4 @@ def donut_update_figure(sector_var,value_var,agg_mode):
 	return fig
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)

@@ -4,6 +4,7 @@ chardet==4.0.0
 charset-normalizer==2.0.12
 click==8.0.4
 dash==2.2.0
+dash-bootstrap-components==1.0.3
 dash-core-components==2.0.0
 dash-html-components==2.0.0
 dash-table==5.0.0
@@ -25,4 +26,3 @@ six==1.16.0
 tenacity==8.0.1
 urllib3==1.26.8
 Werkzeug==2.0.3
-dash-bootstrap-components==1.0.3
