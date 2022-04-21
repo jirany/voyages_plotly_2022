@@ -9,8 +9,6 @@ import requests
 import json
 from app_secrets import *
 
-print("--------",headers,"---------")
-
 r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
 md=json.loads(r.text)
 
@@ -75,6 +73,7 @@ def display_page(selected_app_layout_name):
 	j=r.text
 	global df
 	df=pd.read_json(j)
+	print(df)
 	return(selected_app_layout_name)
 
 @callback(
@@ -129,6 +128,7 @@ def update_bar_graph(x_var,y_var,agg_mode):
 def update_scatter_graph(agg_mode,x_val,y_val,color_val):
 	global df
 	global md
+	print(df)
 	
 	def agg_functions(x_val,y_val,agg_mode,df3):
 		if agg_mode=='Averages':
