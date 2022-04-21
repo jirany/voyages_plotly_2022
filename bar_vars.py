@@ -20,7 +20,6 @@ bar_x_vars=[
 	'voyage_dates__slave_purchase_began_mm',
 	'voyage_dates__date_departed_africa_mm',
 	'voyage_dates__first_dis_of_slaves_mm',
-	'voyage_dates__departure_last_place_of_landing_mm',
 	'voyage_dates__voyage_completed_mm'
 ]
 

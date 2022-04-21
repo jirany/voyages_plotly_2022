@@ -28,7 +28,6 @@ scatter_plot_y_vars=[
 scatter_plot_factors=[
 	'voyage_ship__imputed_nationality__name',
 	'voyage_itinerary__imp_principal_region_of_slave_purchase__region',
-	'voyage_itinerary__imp_principal_region_slave_dis__region',
 	'voyage_itinerary__imp_broad_region_of_slave_purchase__broad_region',
 	'voyage_itinerary__imp_broad_region_slave_dis__broad_region'
 ]

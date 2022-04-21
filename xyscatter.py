@@ -7,13 +7,12 @@ import pandas as pd
 import requests
 import json
 from scatter_vars import *
-from auth_settings import *
-from authenticate import *
+from app_secrets import *
 
 app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
-r=requests.options(base_url+'voyage/?hierarchical=False',headers=auth_headers)
+r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
 md=json.loads(r.text)
 
 url=base_url+'voyage/caches'
@@ -21,7 +20,7 @@ data={
 	'cachename':'voyage_xyscatter'
 }
 
-r=requests.post(url,data,headers=auth_headers)
+r=requests.post(url,data,headers=headers)
 j=r.text
 df=pd.read_json(j)
 

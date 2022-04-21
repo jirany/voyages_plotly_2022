@@ -7,13 +7,12 @@ import pandas as pd
 import requests
 import json
 from donut_vars import *
-from auth_settings import *
-from authenticate import *
+from app_secrets import *
 
 app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
-r=requests.options(base_url+'voyage/?hierarchical=False',headers=auth_headers)
+r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
 md=json.loads(r.text)
 
 url=base_url+'voyage/caches'
@@ -21,7 +20,7 @@ data={
 	'cachename':'voyage_bar_and_donut_charts'
 }
 
-r=requests.post(url,data,headers=auth_headers)
+r=requests.post(url,data,headers=headers)
 j=r.text
 df=pd.read_json(j)
 
@@ -92,19 +91,15 @@ app.layout =  dbc.Container(
 	Input('value_var', 'value'),
 	Input('agg_mode','value')
 	)
-
 def update_figure(sector_var,value_var,agg_mode):
-	
 	if agg_mode=='Averages':
 		df2=df.groupby(sector_var)[value_var].mean()
 		df2=df2.reset_index()
 	elif agg_mode=='Totals/Sums':
 		df2=df.groupby(sector_var)[value_var].sum()
 		df2=df2.reset_index()
-	
 	sectorvarlabel=md[sector_var]['flatlabel']
 	valuevarlabel=md[value_var]['flatlabel']
-	
 	fig=px.pie(df2,values=value_var,names=sector_var,
 		labels={
 			sector_var:sectorvarlabel,
@@ -114,7 +109,6 @@ def update_figure(sector_var,value_var,agg_mode):
 		)
 	fig.update_layout(height=700)
 	fig.update_traces(textposition='inside', textinfo='percent+label')
-
 	return fig
 	
 if __name__ == '__main__':

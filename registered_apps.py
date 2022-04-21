@@ -1,0 +1,1 @@
+registered_apps=["bar","xyscatter","donut"]
