@@ -9,10 +9,10 @@ import requests
 import json
 from app_secrets import *
 
-r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers,suppress_callback_exceptions=True)
+r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
 md=json.loads(r.text)
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP],suppress_callback_exceptions=True)
 server = app.server
 
 registered_apps=[
