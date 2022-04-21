@@ -59,10 +59,6 @@ app.layout =  dbc.Container(
 	]
 )
 
-
-
-
-
 @callback(
 	Output('selected_app_layout_name','data'),
     Input('app_selector', 'value')
@@ -80,7 +76,6 @@ def display_page(selected_app_layout_name):
 	global df
 	df=get_df(url,data,headers)
 	
-	print(df)
 	return(selected_app_layout_name)
 
 @callback(
@@ -135,8 +130,6 @@ def update_bar_graph(x_var,y_var,agg_mode):
 def update_scatter_graph(agg_mode,x_val,y_val,color_val):
 	global df
 	global md
-	print(df)
-	
 	def agg_functions(x_val,y_val,agg_mode,df3):
 		if agg_mode=='Averages':
 			df3=df3.groupby(x_val)[y_val].mean()
@@ -190,7 +183,6 @@ def update_scatter_graph(agg_mode,x_val,y_val,color_val):
 def donut_update_figure(sector_var,value_var,agg_mode):
 	global df
 	global md
-	print(df)
 	
 	if agg_mode=='Averages':
 		df2=df.groupby(sector_var)[value_var].mean()
