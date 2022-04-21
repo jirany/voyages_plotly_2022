@@ -7,6 +7,7 @@ from vars import *
 import pandas as pd
 import requests
 import json
+import gc
 from app_secrets import *
 
 r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
@@ -116,6 +117,8 @@ def update_bar_graph(x_var,y_var,agg_mode):
 		yaxis_title='',
 		height=700
 	)
+	del df2
+	gc.collect()
 	return fig
 
 @app.callback(
@@ -168,7 +171,10 @@ def update_scatter_graph(agg_mode,x_val,y_val,color_val):
 			y=y_vals,
 			fill='tozeroy')
 		)
-	
+	df3=None
+	del df3
+	del df2
+	gc.collect()
 	fig.update_layout(height=700)
 	
 	return fig
@@ -200,7 +206,9 @@ def donut_update_figure(sector_var,value_var,agg_mode):
 		)
 	fig.update_layout(height=700)
 	fig.update_traces(textposition='inside', textinfo='percent+label')
+	del df2
+	gc.collect()
 	return fig
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
