@@ -21,7 +21,12 @@ registered_apps=[
 	["donut_layout","Donut Charts"]
 ]
 
-df=None
+
+def get_df(url,data,headers):
+	r=requests.post(url,data,headers=headers)
+	j=r.text
+	gdf=pd.read_json(j)
+	return gdf
 
 app.layout =  dbc.Container(
 	[
@@ -52,27 +57,27 @@ app.layout =  dbc.Container(
 	]
 )
 
+
+
+
+
 @callback(
 	Output('selected_app_layout_name','data'),
     Input('app_selector', 'value')
 )
-    
 def display_page(selected_app_layout_name):
 	
 	if selected_app_layout_name in ['donut_layout','bar_layout']:
 		cachename='voyage_bar_and_donut_charts'
 	elif selected_app_layout_name=='xyscatter_layout':
 		cachename='voyage_xyscatter'
-	r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
-	md=json.loads(r.text)
 	url=base_url+'voyage/caches'
 	data={
 		'cachename':cachename
 	}
-	r=requests.post(url,data,headers=headers)
-	j=r.text
 	global df
-	df=pd.read_json(j)
+	df=get_df(url,data,headers)
+	
 	print(df)
 	return(selected_app_layout_name)
 
@@ -183,6 +188,7 @@ def update_scatter_graph(agg_mode,x_val,y_val,color_val):
 def donut_update_figure(sector_var,value_var,agg_mode):
 	global df
 	global md
+	print(df)
 	
 	if agg_mode=='Averages':
 		df2=df.groupby(sector_var)[value_var].mean()
