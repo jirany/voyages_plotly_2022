@@ -3,21 +3,18 @@ from vars import *
 import dash_bootstrap_components as dbc
 import requests
 import json
+import time
 from app_secrets import *
 
 r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
 md=json.loads(r.text)
 
-layout1 = html.Div([
-    html.H3('Page 1'),
-    dcc.Dropdown(
-        {f'Page 1 - {i}': f'{i}' for i in ['New York City', 'Montreal', 'Los Angeles']},
-        id='page-1-dropdown'
-    ),
-    html.Div(id='page-1-display-value'),
-    dcc.Link('Go to Page 2', href='/page2')
-])
-
+#token validation
+detail=md.get('detail')
+if detail == "Invalid token.":
+	print("**************\n%s\n%s\nSERVER REJECTED AUTH TOKEN -- CHECK YOUR SETTINGS\n**************" %(base_url,headers))
+	time.sleep(15)
+	exit()
 
 bar_layout =  dbc.Container(
 	[

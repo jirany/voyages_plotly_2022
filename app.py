@@ -23,17 +23,15 @@ registered_apps=[
 ]
 
 
-def update_df(url,data,headers):
-	global df
-	r=requests.post(url,data,headers=headers)
+def update_df(url,data):
+	global headers
+	r=requests.post(url,data=data,headers=headers)
 	j=r.text
 	df=pd.read_json(j)
-
-df=update_df(base_url+'voyage/caches',data={'cachename':'voyage_xyscatter'},headers=headers)
+	return df
 
 app.layout =  dbc.Container(
 	[
-		dcc.Store(id="selected_app_layout_name"),
 		dbc.Row([
 			dbc.Card([
 				dbc.Col(
@@ -61,28 +59,9 @@ app.layout =  dbc.Container(
 )
 
 @callback(
-	Output('selected_app_layout_name','data'),
+	Output('page-content', 'children'),
     Input('app_selector', 'value')
 )
-def display_page(selected_app_layout_name):
-	if selected_app_layout_name in ['donut_layout','bar_layout']:
-		cachename='voyage_bar_and_donut_charts'
-	elif selected_app_layout_name=='xyscatter_layout':
-		cachename='voyage_xyscatter'
-	url=base_url+'voyage/caches'
-	data={
-		'cachename':cachename
-	}
-	
-	update_df(url,data,headers)
-	
-	return(selected_app_layout_name)
-
-@callback(
-	Output('page-content', 'children'),
-    Input('selected_app_layout_name', 'data')
-)
-    
 def display_page(selected_app_layout_name):
 	return eval(selected_app_layout_name)
 
@@ -93,8 +72,18 @@ def display_page(selected_app_layout_name):
 	Input('bar_agg_mode','value')
 	)
 def update_bar_graph(x_var,y_var,agg_mode):
-	global df
 	global md
+
+	data={
+		'selected_fields':[x_var,y_var],
+		'cachename':['voyage_bar_and_donut_charts']
+	}
+	
+	df=update_df(
+		base_url+'voyage/caches',
+		data=data
+	)
+	
 	if agg_mode=='Averages':
 		df2=df.groupby(x_var)[y_var].mean()
 		df2=df2.reset_index()
@@ -130,7 +119,6 @@ def update_bar_graph(x_var,y_var,agg_mode):
 	)
 
 def update_scatter_graph(agg_mode,x_val,y_val,color_val):
-	global df
 	global md
 	def agg_functions(x_val,y_val,agg_mode,df3):
 		if agg_mode=='Averages':
@@ -140,6 +128,18 @@ def update_scatter_graph(agg_mode,x_val,y_val,color_val):
 			df3=df3.groupby(x_val)[y_val].sum()
 			df3=df3.reset_index()
 		return(df3)
+	
+	selected_fields=[i for i in [x_val,y_val,color_val] if i!="Do Not Group"]
+	
+	data={
+		'selected_fields':selected_fields,
+		'cachename':['voyage_xyscatter']
+	}
+	
+	df=update_df(
+		base_url+'voyage/caches',
+		data=data
+	)
 	
 	figtitle='Stacked %s of:<br>' %agg_mode.lower() + md[y_val]['flatlabel']
 	
@@ -186,8 +186,17 @@ def update_scatter_graph(agg_mode,x_val,y_val,color_val):
 	Input('donut_agg_mode','value')
 	)
 def donut_update_figure(sector_var,value_var,agg_mode):
-	global df
 	global md
+	
+	data={
+		'selected_fields':[sector_var,value_var],
+		'cachename':['voyage_bar_and_donut_charts']
+	}
+	
+	df=update_df(
+		base_url+'voyage/caches',
+		data=data
+	)
 	
 	if agg_mode=='Averages':
 		df2=df.groupby(sector_var)[value_var].mean()
