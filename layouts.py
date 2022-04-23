@@ -266,3 +266,29 @@ pivot_table_layout =  dbc.Container(
 		])
 	]
 )
+
+
+scatter_map =  dbc.Container(
+	[
+		dbc.Row([
+			dbc.Col(
+				html.Div([
+					html.Label('Geographic granularity level'),
+					dcc.Dropdown(
+						id='levelselect',
+						options=[{'label':i,'value':i} for i in ['ports','regions']],
+						value='regions',
+						multi=False
+					)
+				])
+			)
+		]),
+		dbc.Row([
+			dbc.Col(
+				html.Div([
+					dcc.Graph(id='scatter_map')
+				])
+			)
+		])
+	]
+)

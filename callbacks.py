@@ -4,6 +4,7 @@ import requests
 import json
 import plotly.express as px
 import plotly.graph_objects as go
+import numpy as np
 import gc
 from app_secrets import *
 
@@ -16,6 +17,13 @@ def update_df(url,data):
 	j=r.text
 	df=pd.read_json(j)
 	return df
+
+
+def labeltrim(s,threshold=15):
+	if len(s)>threshold:
+		s=s[:threshold-1]+"..."
+	return s
+
 
 @callback(
 	Output('voyages-bar-graph', 'figure'),
@@ -218,5 +226,76 @@ def pivot_table_update_figure(rows,columns,cells,rmna,valuefunction):
 	output=df.to_dict('records')
 	
 	return output
+
+
+
+
+@callback(
+	Output('scatter_map', 'figure'),
+	Input('levelselect','value')
+	)
+def pivot_table_update_figure(levelselect):
+	global md
+	
+	import voyages_geo_to_geojson_points_dict as vd
+	
+	gd=vd.main()
+	
+	if levelselect=="ports":
+		groupby_fields=[
+			'voyage_itinerary__imp_principal_place_of_slave_purchase__value',
+			'voyage_itinerary__imp_principal_port_slave_dis__value'
+			]
+	elif levelselect=="regions":
+		groupby_fields=[
+			'voyage_itinerary__imp_principal_place_of_slave_purchase__region__value',
+			'voyage_itinerary__imp_principal_port_slave_dis__region__value'
+		]
+	
+	
+	data={
+		'show_on_map':["True"],
+		'groupby_fields':groupby_fields,
+		'value_field_tuple':['voyage_slaves_numbers__imp_total_num_slaves_embarked','sum'],
+		'cachename':['voyage_maps']
+	}
+	
+	r=requests.post(url=base_url+'voyage/groupby',headers=headers,data=data)
+	j=json.loads(r.text)
+	
+	fig = go.Figure()
+	for source in j:
+		for target in j[source]:
+			#print(source,target,j[source][target])
+			tv=int(eval(source))
+			sv=int(eval(target))
+			v=j[source][target]
+			if pd.isna(v):
+				v=0
+			
+			if v!=0:
+				s_lon,s_lat=gd[sv]['geometry']['coordinates']
+				t_lon,t_lat=gd[tv]['geometry']['coordinates']
+				sname=gd[sv]['properties']['name']
+				tname=gd[tv]['properties']['name']
+				text="%s people transported from %s to %s" %(int(v),sname,tname)
+				label="%s --> %s" %(labeltrim(sname),labeltrim(tname))
+				fig.add_trace(go.Scattergeo(
+					lon=[s_lon,t_lon],
+					lat=[s_lat,t_lat],
+					mode='lines',
+					text=text,
+					name=label,
+					line=dict(width=np.log(v))
+				))
+	fig.update_layout(height=700)
+	
+	del gd,j
+	gc.collect()
+	
+	return fig
+
+
+
 
 
