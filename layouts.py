@@ -275,9 +275,20 @@ leaflet_map =  dbc.Container(
 				html.Div([
 					html.Label('Geographic granularity level'),
 					dcc.Dropdown(
-						id='leaflet_map_levelselect',
+						id='leaflet-map-levelselect',
 						options=[{'label':i,'value':i} for i in ['ports','regions','broad_regions']],
 						value='regions',
+						multi=False
+					)
+				])
+			),
+			dbc.Col(
+				html.Div([
+					html.Label('Map style'),
+					dcc.Dropdown(
+						id='leaflet-map-tilesets-selelect',
+						options=[i for i in map_tilesets],
+						value=map_tilesets[0]['value'],
 						multi=False
 					)
 				])
@@ -289,15 +300,17 @@ leaflet_map =  dbc.Container(
 					dl.Map(
 						[
 							dl.TileLayer(id="tile-layer"),
-							dl.LayerGroup(id='feature-layer')
+							dl.LayerGroup(id='routes-feature-layer'),
 						],
 						id="map",
 						style={
 							'width': '100%',
-							'height': '800px',
+							'height': '100vh',
 							'margin': "auto",
 							"display": "block"
-						}
+						},
+						center=(0,0),
+						zoom=2
 					)
 				])
 			)

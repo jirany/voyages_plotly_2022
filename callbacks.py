@@ -227,19 +227,31 @@ def pivot_table_update_figure(rows,columns,cells,rmna,valuefunction):
 	
 	return output
 
+#per:
+##https://voyages-leaflet.herokuapp.com/
+##https://github.com/JohnMulligan/voyages-api-leaflet
+##https://dash-leaflet.herokuapp.com/
+
 
 @callback(
-	Output('feature-layer', 'children'),
-	Input('leaflet_map_levelselect','value')
+	Output('tile-layer', 'url'),
+	Input('leaflet-map-tilesets-selelect','value')
 	)
-def get_leaflet_map(levelselect):
+def get_leaflet_tiles(tileset_select):
+	return tileset_select
+
+import voyages_geo_to_geojson_points_dict as vd
+gd=vd.main()
+
+@callback(
+	Output('routes-feature-layer', 'children'),
+	Input('leaflet-map-levelselect','value')
+	)
+def get_leaflet_routes(levelselect):
+	global gd
 	global md
 	
-	import voyages_geo_to_geojson_points_dict as vd
-	
 	import dash_leaflet as dl
-	
-	gd=vd.main()
 	
 	if levelselect=="ports":
 		groupby_fields=[
@@ -257,7 +269,6 @@ def get_leaflet_map(levelselect):
 			'voyage_itinerary__imp_principal_port_slave_dis__region__broad_region__value'
 		]
 	
-	
 	data={
 		'show_on_map':["True"],
 		'groupby_fields':groupby_fields,
@@ -268,7 +279,7 @@ def get_leaflet_map(levelselect):
 	r=requests.post(url=base_url+'voyage/groupby',headers=headers,data=data)
 	j=json.loads(r.text)
 	
-	featurecollection={"type":"FeatureCollection","features":[]}
+	routes_featurecollection={"type":"FeatureCollection","features":[]}
 	for source in j:
 		for target in j[source]:
 			#print(source,target,j[source][target])
@@ -285,7 +296,7 @@ def get_leaflet_map(levelselect):
 				tname=gd[tv]['properties']['name']
 				text="%s people transported from %s to %s" %(int(v),sname,tname)
 				label="%s --> %s" %(labeltrim(sname),labeltrim(tname))
-				featurecollection['features'].append({
+				routes_featurecollection['features'].append({
 					"type":"Feature",
 					"geometry":{
 						"type":"LineString",
@@ -299,4 +310,4 @@ def get_leaflet_map(levelselect):
 					}
 				})
 	
-	return dl.GeoJSON(data=featurecollection)
+	return dl.GeoJSON(data=routes_featurecollection)

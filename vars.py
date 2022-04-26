@@ -1,3 +1,5 @@
+from app_secrets import *
+
 donut_value_vars=[
 	'voyage_dates__imp_length_home_to_disembark',
 	'voyage_dates__length_middle_passage_days',	
@@ -115,4 +117,11 @@ pivot_table_numerical_vars=[
 	'voyage_dates__length_middle_passage_days',
 	'voyage_slaves_numbers__imp_total_num_slaves_embarked',
 	'voyage_slaves_numbers__imp_total_num_slaves_disembarked'
+]
+
+map_tilesets=[
+	{"label":i[0],"value":i[1]} for i in [
+	["Modern Countries","https://api.mapbox.com/styles/v1/%s/tiles/{z}/{x}/{y}?access_token=%s" %("jcm10/cl2gmkgjt000014rstx5nmcj6",mapbox_access_token)],
+	["Land & Sea Only","https://api.mapbox.com/styles/v1/%s/tiles/{z}/{x}/{y}?access_token=%s" %("jcm10/cl2glcidk000k14nxnr44tu0o",mapbox_access_token)]
+	]
 ]
