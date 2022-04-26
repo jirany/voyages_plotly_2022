@@ -27,3 +27,4 @@ tenacity==8.0.1
 urllib3==1.26.8
 Werkzeug==2.0.3
 gunicorn
+dash_leaflet

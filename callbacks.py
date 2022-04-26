@@ -228,16 +228,16 @@ def pivot_table_update_figure(rows,columns,cells,rmna,valuefunction):
 	return output
 
 
-
-
 @callback(
-	Output('scatter_map', 'figure'),
-	Input('levelselect','value')
+	Output('feature-layer', 'children'),
+	Input('leaflet_map_levelselect','value')
 	)
-def pivot_table_update_figure(levelselect):
+def get_leaflet_map(levelselect):
 	global md
 	
 	import voyages_geo_to_geojson_points_dict as vd
+	
+	import dash_leaflet as dl
 	
 	gd=vd.main()
 	
@@ -251,6 +251,11 @@ def pivot_table_update_figure(levelselect):
 			'voyage_itinerary__imp_principal_place_of_slave_purchase__region__value',
 			'voyage_itinerary__imp_principal_port_slave_dis__region__value'
 		]
+	elif levelselect=="broad_regions":
+		groupby_fields=[
+			'voyage_itinerary__imp_principal_place_of_slave_purchase__region__broad_region__value',
+			'voyage_itinerary__imp_principal_port_slave_dis__region__broad_region__value'
+		]
 	
 	
 	data={
@@ -263,16 +268,16 @@ def pivot_table_update_figure(levelselect):
 	r=requests.post(url=base_url+'voyage/groupby',headers=headers,data=data)
 	j=json.loads(r.text)
 	
-	fig = go.Figure()
+	featurecollection={"type":"FeatureCollection","features":[]}
 	for source in j:
 		for target in j[source]:
 			#print(source,target,j[source][target])
-			tv=int(eval(source))
-			sv=int(eval(target))
+			tv=int(eval(target))
+			sv=int(eval(source))
 			v=j[source][target]
 			if pd.isna(v):
 				v=0
-			
+		
 			if v!=0:
 				s_lon,s_lat=gd[sv]['geometry']['coordinates']
 				t_lon,t_lat=gd[tv]['geometry']['coordinates']
@@ -280,22 +285,18 @@ def pivot_table_update_figure(levelselect):
 				tname=gd[tv]['properties']['name']
 				text="%s people transported from %s to %s" %(int(v),sname,tname)
 				label="%s --> %s" %(labeltrim(sname),labeltrim(tname))
-				fig.add_trace(go.Scattergeo(
-					lon=[s_lon,t_lon],
-					lat=[s_lat,t_lat],
-					mode='lines',
-					text=text,
-					name=label,
-					line=dict(width=np.log(v))
-				))
-	fig.update_layout(height=700)
+				featurecollection['features'].append({
+					"type":"Feature",
+					"geometry":{
+						"type":"LineString",
+						"coordinates":[[s_lon,s_lat],[t_lon,t_lat]]
+					},
+					"properties":{
+						"Value":np.log(v),
+						"source_id":sv,
+						"target_id":tv,
+						"label":label
+					}
+				})
 	
-	del gd,j
-	gc.collect()
-	
-	return fig
-
-
-
-
-
+	return dl.GeoJSON(data=featurecollection)

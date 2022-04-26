@@ -7,6 +7,7 @@ from callbacks import *
 import json
 from app_secrets import *
 
+
 r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
 md=json.loads(r.text)
 
@@ -18,7 +19,7 @@ registered_apps=[
 	["bar_layout","Bar Charts"],
 	["donut_layout","Donut Charts"],
 	["pivot_table_layout","Pivot Table Layout"],
-	["scatter_map","Map (experimental)"]
+	["leaflet_map","LEAFLET map (experimental)"]
 ]
 
 app.layout =  dbc.Container(

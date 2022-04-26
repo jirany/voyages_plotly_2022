@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 import requests
 import json
 import time
+import dash_leaflet as dl
 from app_secrets import *
 
 r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
@@ -267,16 +268,15 @@ pivot_table_layout =  dbc.Container(
 	]
 )
 
-
-scatter_map =  dbc.Container(
+leaflet_map =  dbc.Container(
 	[
 		dbc.Row([
 			dbc.Col(
 				html.Div([
 					html.Label('Geographic granularity level'),
 					dcc.Dropdown(
-						id='levelselect',
-						options=[{'label':i,'value':i} for i in ['ports','regions']],
+						id='leaflet_map_levelselect',
+						options=[{'label':i,'value':i} for i in ['ports','regions','broad_regions']],
 						value='regions',
 						multi=False
 					)
@@ -286,7 +286,19 @@ scatter_map =  dbc.Container(
 		dbc.Row([
 			dbc.Col(
 				html.Div([
-					dcc.Graph(id='scatter_map')
+					dl.Map(
+						[
+							dl.TileLayer(id="tile-layer"),
+							dl.LayerGroup(id='feature-layer')
+						],
+						id="map",
+						style={
+							'width': '100%',
+							'height': '800px',
+							'margin': "auto",
+							"display": "block"
+						}
+					)
 				])
 			)
 		])
