@@ -6,9 +6,7 @@ import json
 import time
 import dash_leaflet as dl
 from app_secrets import *
-
-r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
-md=json.loads(r.text)
+from tools import *
 
 #token validation
 detail=md.get('detail')
@@ -268,8 +266,41 @@ pivot_table_layout =  dbc.Container(
 	]
 )
 
+
 leaflet_map =  dbc.Container(
 	[
+		dbc.Row([
+			dbc.Card([
+				html.H5("Search/Filters"),
+				dbc.Row([
+					dbc.Col(
+						html.Div([
+							html.Label('Dataset'),
+							dcc.RadioItems(
+								id='map-dataset',
+								options=[{'label': i[0], 'value': i[1]} for i in 
+										[
+											["Trans-Atlantic",0],
+											["Intra-American",1]
+										]
+									],
+								value=0,
+								labelStyle={'display': 'block'}
+							)
+						])
+					)
+				]),
+				dbc.Row([
+					dbc.Col(
+						html.Div([
+							html.Hr(),
+							html.Label('Voyage Year'),
+							get_rangeslider('voyage_dates__imp_arrival_at_port_of_dis_yyyy','voyage_dates__imp_arrival_at_port_of_dis_yyyy-maps-slider')
+						])
+					)
+				])
+			])
+		]),
 		dbc.Row([
 			dbc.Col(
 				html.Div([

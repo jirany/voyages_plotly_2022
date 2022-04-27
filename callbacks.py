@@ -1,5 +1,6 @@
 from dash import Input, Output, callback, dash_table
 import pandas as pd
+import re
 import requests
 import json
 import plotly.express as px
@@ -7,9 +8,7 @@ import plotly.graph_objects as go
 import numpy as np
 import gc
 from app_secrets import *
-
-r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
-md=json.loads(r.text)
+from tools import *
 
 def update_df(url,data):
 	global headers
@@ -245,9 +244,11 @@ gd=vd.main()
 
 @callback(
 	Output('routes-feature-layer', 'children'),
-	Input('leaflet-map-levelselect','value')
+	Input('leaflet-map-levelselect','value'),
+	Input('map-dataset','value'),
+	Input('voyage_dates__imp_arrival_at_port_of_dis_yyyy-maps-slider','value')
 	)
-def get_leaflet_routes(levelselect):
+def get_leaflet_routes(levelselect,dataset_val,yearam):
 	global gd
 	global md
 	
@@ -270,13 +271,29 @@ def get_leaflet_routes(levelselect):
 		]
 	
 	data={
-		'show_on_map':["True"],
 		'groupby_fields':groupby_fields,
 		'value_field_tuple':['voyage_slaves_numbers__imp_total_num_slaves_embarked','sum'],
 		'cachename':['voyage_maps']
 	}
 	
+	
+	
+	##ADD SOME FILTERS:
+	
+	##ONLY VOYAGES IN THE YEAR RANGE
+	data['voyage_dates__imp_arrival_at_port_of_dis_yyyy']=yearam
+	
+	##ONLY LOCATIONS THAT SHOULD BE SHOWN ON THE MAP
+	for groupby_field in groupby_fields:
+		groupbyfield_showonmap_varname=re.sub("__value$","__show_on_map",groupby_field)
+		data[groupbyfield_showonmap_varname]=["True"]
+	
+	dataset=[dataset_val,dataset_val]
+	
+	data['dataset']=[dataset]
+	
 	r=requests.post(url=base_url+'voyage/groupby',headers=headers,data=data)
+	print(r)
 	j=json.loads(r.text)
 	
 	routes_featurecollection={"type":"FeatureCollection","features":[]}

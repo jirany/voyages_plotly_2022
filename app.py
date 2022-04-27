@@ -6,10 +6,7 @@ import requests
 from callbacks import *
 import json
 from app_secrets import *
-
-
-r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
-md=json.loads(r.text)
+from tools import *
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP],suppress_callback_exceptions=True)
 server = app.server
