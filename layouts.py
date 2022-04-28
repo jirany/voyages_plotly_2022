@@ -304,20 +304,9 @@ leaflet_map =  dbc.Container(
 		dbc.Row([
 			dbc.Col(
 				html.Div([
-					html.Label('Geographic granularity level'),
-					dcc.Dropdown(
-						id='leaflet-map-levelselect',
-						options=[{'label':i,'value':i} for i in ['ports','regions','broad_regions']],
-						value='regions',
-						multi=False
-					)
-				])
-			),
-			dbc.Col(
-				html.Div([
 					html.Label('Map style'),
 					dcc.Dropdown(
-						id='leaflet-map-tilesets-selelect',
+						id='leaflet-map-tilesets-select',
 						options=[i for i in map_tilesets],
 						value=map_tilesets[0]['value'],
 						multi=False
@@ -334,64 +323,6 @@ leaflet_map =  dbc.Container(
 							dl.LayerGroup(id='routes-feature-layer'),
 						],
 						id="map",
-						style={
-							'width': '100%',
-							'height': '100vh',
-							'margin': "auto",
-							"display": "block"
-						},
-						center=(0,0),
-						zoom=2
-					)
-				])
-			)
-		])
-	]
-)
-
-
-leaflet_map_routes =  dbc.Container(
-	[
-		dbc.Row([
-			dbc.Col(
-				html.Div([
-					html.Label('Geographic granularity level'),
-					dcc.Dropdown(
-						id='leaflet-map-levelselect-routes',
-						options=[{'label':i,'value':i} for i in ['ports']],
-						value='ports',
-						multi=False
-					)
-				])
-			)
-		]),
-		dbc.Row([
-			dbc.Col(
-				html.Div([
-					html.Label('Dataset'),
-					dcc.RadioItems(
-						id='map-dataset-routes',
-						options=[{'label': i[0], 'value': i[1]} for i in 
-								[
-									["Trans-Atlantic",0],
-									["Intra-American",1]
-								]
-							],
-						value=0,
-						labelStyle={'display': 'block'}
-					)
-				])
-			)
-		]),
-		dbc.Row([
-			dbc.Col(
-				html.Div([
-					dl.Map(
-						[
-							dl.TileLayer(id="tile-layer-routes",url=map_tilesets[0]['value']),
-							dl.LayerGroup(id='routes-feature-layer-routes'),
-						],
-						id="map-routes",
 						style={
 							'width': '100%',
 							'height': '100vh',

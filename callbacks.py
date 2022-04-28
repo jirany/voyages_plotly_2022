@@ -235,7 +235,7 @@ def pivot_table_update_figure(rows,columns,cells,rmna,valuefunction):
 
 @callback(
 	Output('tile-layer', 'url'),
-	Input('leaflet-map-tilesets-selelect','value')
+	Input('leaflet-map-tilesets-select','value')
 	)
 def get_leaflet_tiles(tileset_select):
 	return tileset_select
@@ -245,105 +245,10 @@ gd=vd.main()
 
 @callback(
 	Output('routes-feature-layer', 'children'),
-	Input('leaflet-map-levelselect','value'),
 	Input('map-dataset','value'),
 	Input('voyage_dates__imp_arrival_at_port_of_dis_yyyy-maps-slider','value')
 	)
-def get_leaflet_routes(levelselect,dataset_val,yearam):
-	global gd
-	global md
-	
-	import dash_leaflet as dl
-	
-	if levelselect=="ports":
-		groupby_fields=[
-			'voyage_itinerary__imp_principal_place_of_slave_purchase__value',
-			'voyage_itinerary__imp_principal_port_slave_dis__value'
-			]
-	elif levelselect=="regions":
-		groupby_fields=[
-			'voyage_itinerary__imp_principal_place_of_slave_purchase__region__value',
-			'voyage_itinerary__imp_principal_port_slave_dis__region__value'
-		]
-	elif levelselect=="broad_regions":
-		groupby_fields=[
-			'voyage_itinerary__imp_principal_place_of_slave_purchase__region__broad_region__value',
-			'voyage_itinerary__imp_principal_port_slave_dis__region__broad_region__value'
-		]
-	
-	data={
-		'groupby_fields':groupby_fields,
-		'value_field_tuple':['voyage_slaves_numbers__imp_total_num_slaves_embarked','sum'],
-		'cachename':['voyage_maps']
-	}
-	
-	
-	
-	##ADD SOME FILTERS:
-	
-	##ONLY VOYAGES IN THE YEAR RANGE
-	data['voyage_dates__imp_arrival_at_port_of_dis_yyyy']=yearam
-	
-	##ONLY LOCATIONS THAT SHOULD BE SHOWN ON THE MAP
-	for groupby_field in groupby_fields:
-		groupbyfield_showonmap_varname=re.sub("__value$","__show_on_map",groupby_field)
-		data[groupbyfield_showonmap_varname]=["True"]
-	
-	dataset=[dataset_val,dataset_val]
-	
-	data['dataset']=[dataset]
-	
-	r=requests.post(url=base_url+'voyage/groupby',headers=headers,data=data)
-	print(r)
-	j=json.loads(r.text)
-	
-	routes_featurecollection={"type":"FeatureCollection","features":[]}
-	for source in j:
-		for target in j[source]:
-			#print(source,target,j[source][target])
-			tv=int(eval(target))
-			sv=int(eval(source))
-			v=j[source][target]
-			if pd.isna(v):
-				v=0
-		
-			if v!=0:
-				s_lon,s_lat=gd[sv]['geometry']['coordinates']
-				t_lon,t_lat=gd[tv]['geometry']['coordinates']
-				sname=gd[sv]['properties']['name']
-				tname=gd[tv]['properties']['name']
-				text="%s people transported from %s to %s" %(int(v),sname,tname)
-				label="%s --> %s" %(labeltrim(sname),labeltrim(tname))
-				routes_featurecollection['features'].append({
-					"type":"Feature",
-					"geometry":{
-						"type":"LineString",
-						"coordinates":[[s_lon,s_lat],[t_lon,t_lat]]
-					},
-					"properties":{
-						"Value":np.log(v),
-						"source_id":sv,
-						"target_id":tv,
-						"label":label
-					}
-				})
-	
-	return dl.GeoJSON(data=routes_featurecollection)
-
-
-
-
-
-
-
-
-
-
-@callback(
-	Output('routes-feature-layer-routes', 'children'),
-	Input('map-dataset-routes','value')
-	)
-def get_leaflet_routes(dataset):
+def get_leaflet_routes(dataset,yearam):
 	global gd
 	global md
 	
@@ -367,9 +272,22 @@ def get_leaflet_routes(dataset):
 		'groupby_fields':groupby_fields,
 		'value_field_tuple':['voyage_slaves_numbers__imp_total_num_slaves_embarked','sum'],
 		'cachename':['voyage_maps'],
-		'rmna':['All'],
-		'dataset':[dataset,dataset]
+		'rmna':['All']
 	}
+	
+	##ADD SOME FILTERS:
+	
+	##ONLY VOYAGES IN THE YEAR RANGE
+	data['voyage_dates__imp_arrival_at_port_of_dis_yyyy']=yearam
+	
+	##ONLY LOCATIONS THAT SHOULD BE SHOWN ON THE MAP
+	for groupby_field in groupby_fields:
+		groupbyfield_showonmap_varname=re.sub("__id$","__show_on_map",groupby_field)
+		data[groupbyfield_showonmap_varname]=["True"]
+	
+	dataset=[dataset,dataset]
+	
+	data['dataset']=[dataset]
 	
 	r=requests.post(url=base_url+'voyage/groupby',headers=headers,data=data)
 	j=json.loads(r.text)
