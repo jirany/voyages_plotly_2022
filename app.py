@@ -16,7 +16,8 @@ registered_apps=[
 	["bar_layout","Bar Charts"],
 	["donut_layout","Donut Charts"],
 	["pivot_table_layout","Pivot Table Layout"],
-	["leaflet_map","Leaflet map (experimental)"]
+	["leaflet_map","Leaflet map (experimental)"],
+	["leaflet_map_routes","leaflet map 2"]
 ]
 
 app.layout =  dbc.Container(

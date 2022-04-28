@@ -9,6 +9,7 @@ import numpy as np
 import gc
 from app_secrets import *
 from tools import *
+import dash_leaflet as dl
 
 def update_df(url,data):
 	global headers
@@ -326,5 +327,100 @@ def get_leaflet_routes(levelselect,dataset_val,yearam):
 						"label":label
 					}
 				})
+	
+	return dl.GeoJSON(data=routes_featurecollection)
+
+
+
+
+
+
+
+
+
+
+@callback(
+	Output('routes-feature-layer-routes', 'children'),
+	Input('map-dataset-routes','value')
+	)
+def get_leaflet_routes(dataset):
+	global gd
+	global md
+	
+	#with routes, the way those networks are currently built, we can really only do ports...
+	##Specifically,
+	###A) the port_routes json tables are keyed against the sql id not the spss value (why?)
+	###B) the regional_routes json appears to be keyed to NOTHING in the db
+	##That all needs to be changed: spss values, and everything in the db.
+	
+	groupby_fields=[
+		'voyage_itinerary__imp_principal_port_slave_dis__id',
+		'voyage_itinerary__imp_principal_place_of_slave_purchase__id'
+		]
+	
+	#load the appropriate routes (different for transatlantic vs intraamerican)
+	datasetnamemap={0:"trans",1:"intra"}
+	port_routes=loadjson(os.path.join('static',datasetnamemap[dataset],'port_routes.json'))
+	regional_routes=loadjson(os.path.join('static',datasetnamemap[dataset],'regional_routes.json'))
+	
+	data={
+		'groupby_fields':groupby_fields,
+		'value_field_tuple':['voyage_slaves_numbers__imp_total_num_slaves_embarked','sum'],
+		'cachename':['voyage_maps'],
+		'rmna':['All'],
+		'dataset':[dataset,dataset]
+	}
+	
+	r=requests.post(url=base_url+'voyage/groupby',headers=headers,data=data)
+	j=json.loads(r.text)
+	
+	routes_featurecollection={"type":"FeatureCollection","features":[]}
+	
+	for source in j:
+		for target in j[source]:
+			sv=int(eval(source))
+			tv=int(eval(target))
+			
+			#this will fail if there's no lookup for the given port's pk in the json
+			s_reg=str(port_routes['src'][str(sv)]['reg'])
+			t_reg=str(port_routes['dst'][str(tv)]['reg'])
+			
+			if s_reg=="-1" or t_reg=="-1":
+				skipthis=True
+			else:
+				skipthis=False
+			
+			if not skipthis:
+				s_lon,s_lat=gd[sv]['geometry']['coordinates']
+				t_lon,t_lat=gd[tv]['geometry']['coordinates']
+				
+				#try to use the routing, but draw a straight line if there is none
+				try:
+					region_linestring=[[i[1],i[0]] for i in regional_routes[str(s_reg)][str(t_reg)]]
+					linestring=[[s_lon,s_lat]]+region_linestring+[[t_lon,t_lat]]
+				except:
+					linestring=[[s_lon,s_lat],[t_lon,t_lat]]
+				
+				v=j[source][target]
+				if v>0:
+					sname=gd[sv]['properties']['name']
+					tname=gd[tv]['properties']['name']
+					text="%s people transported from %s to %s" %(int(v),sname,tname)
+					label="%s --> %s" %(labeltrim(sname),labeltrim(tname))
+					routes_featurecollection['features'].append({
+						"type":"Feature",
+						"geometry":{
+							"type":"LineString",
+							"coordinates":linestring
+						},
+						"properties":{
+							"Value":np.log(v),
+							"source_id":sv,
+							"target_id":tv,
+							"label":label
+						}
+					})
+		
+	dumpjson("routes_featurecollection.json",routes_featurecollection)
 	
 	return dl.GeoJSON(data=routes_featurecollection)

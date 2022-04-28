@@ -4,11 +4,20 @@ import json
 from app_secrets import *
 from dash import dcc
 
-
 r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
 md=json.loads(r.text)
 
-
+def loadjson(fname):
+	d=open(fname,"r")
+	t=d.read()
+	j=json.loads(t)
+	d.close()
+	return j
+def dumpjson(fname,data):
+	d=open(fname,"w")
+	d.write(json.dumps(data))
+	d.close()
+	return True
 
 def get_rangeslider(fq_varname,component_id):
 	data={

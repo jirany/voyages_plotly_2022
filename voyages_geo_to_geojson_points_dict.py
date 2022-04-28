@@ -30,7 +30,7 @@ def main():
 	for i in flatgeo:
 		for tp in type_prefixes:
 			prefix=type_prefixes[tp]
-			geocode=i[prefix+'value']
+			geocode=i[prefix+'id']
 			if geocode is None:
 				geocode=default_geocode
 		
@@ -53,7 +53,7 @@ def main():
 					"class":tp,
 					tp:i[prefix+tp],
 					"name":i[prefix+tp],
-					"id":i[prefix+'value']
+					"id":i[prefix+'id']
 				}
 			}
 			for k in [j for j in i if j.startswith(prefix+"show_on")]:
