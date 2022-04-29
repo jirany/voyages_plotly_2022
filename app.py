@@ -58,6 +58,9 @@ def display_page(selected_app_layout_name):
 	
 	selected_app_layout_name=re.sub("/","",selected_app_layout_name)
 	
+	if selected_app_layout_name not in [k[0] for k in registered_apps]:
+		selected_app_layout_name=registered_apps[0][0]
+	
 	return eval(selected_app_layout_name)
 
 
