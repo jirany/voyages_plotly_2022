@@ -4,6 +4,7 @@ from layouts import *
 from vars import *
 import requests
 from callbacks import *
+import time
 import json
 from app_secrets import *
 from tools import *
@@ -53,6 +54,12 @@ app.layout =  dbc.Container(
 )
 def display_page(selected_app_layout_name):
 	return eval(selected_app_layout_name)
+
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)

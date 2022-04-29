@@ -51,7 +51,7 @@ bar_layout =  dbc.Container(
 													id='bar_agg_mode',
 													options=[{'label': i, 'value': i} for i in ['Totals/Sums','Averages']],
 													value='Totals/Sums',
-													labelStyle={'display': 'inline-block'}
+													labelStyle={'display': 'inline'}
 												)
 											]),
 											width=12,xs=12,sm=12,md=12,lg=6
@@ -100,7 +100,7 @@ xyscatter_layout =  dbc.Container(
 												id='scatter_agg_mode',
 												options=[{'label': i, 'value': i} for i in ['Totals/Sums','Averages']],
 												value='Totals/Sums',
-												labelStyle={'display': 'inline-block'}
+												labelStyle={'display': 'block'}
 									)
 								]),width=3,xs=12,sm=12,md=3,lg=3)
 						]),
@@ -179,7 +179,7 @@ donut_layout =  dbc.Container(
 												id='donut_agg_mode',
 												options=[{'label': i, 'value': i} for i in ['Totals/Sums','Averages']],
 												value='Totals/Sums',
-												labelStyle={'display': 'inline-block'}
+												labelStyle={'display': 'inline'}
 											)
 										]),
 										width=12,xs=12,sm=12,md=12,lg=6
@@ -239,14 +239,14 @@ pivot_table_layout =  dbc.Container(
 												id='rmna',
 												options=[{'label': i, 'value': i} for i in ['True','False']],
 												value='sum',
-												labelStyle={'display': 'inline-block'}
+												labelStyle={'display': 'inline'}
 											),
 											html.Label('Value Function'),
 											dcc.RadioItems(
 												id='valuefunction',
 												options=[{'label': i, 'value': i} for i in ['sum','mean','normalize_columns','normalize_rows']],
 												value='sum',
-												labelStyle={'display': 'inline-block'}
+												labelStyle={'display': 'inline'}
 											)
 										]),
 									)
@@ -337,3 +337,4 @@ leaflet_map =  dbc.Container(
 		])
 	]
 )
+

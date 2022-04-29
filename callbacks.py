@@ -1,4 +1,5 @@
-from dash import Input, Output, callback, dash_table
+from dash import Input, Output, callback, dash_table,State
+from dash.exceptions import PreventUpdate
 import pandas as pd
 import re
 import requests
@@ -339,6 +340,7 @@ def get_leaflet_routes(dataset,yearam):
 						}
 					})
 		
-	dumpjson("routes_featurecollection.json",routes_featurecollection)
+	#dumpjson("routes_featurecollection.json",routes_featurecollection)
 	
 	return dl.GeoJSON(data=routes_featurecollection)
+
