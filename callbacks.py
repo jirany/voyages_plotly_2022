@@ -30,15 +30,20 @@ def labeltrim(s,threshold=15):
 	Output('voyages-bar-graph', 'figure'),
 	Input('bar_x_var', 'value'),
 	Input('bar_y_var', 'value'),
-	Input('bar_agg_mode','value')
+	Input('bar_agg_mode','value'),
+	Input('search_params', 'data')
 	)
-def update_bar_graph(x_var,y_var,agg_mode):
+def update_bar_graph(x_var,y_var,agg_mode,search_data):
 	global md
 
 	data={
 		'selected_fields':[x_var,y_var],
 		'cachename':['voyage_bar_and_donut_charts']
 	}
+	
+	search_data=json.loads(search_data)
+	for sdk in search_data:
+		data[sdk]=search_data[sdk]
 	
 	df=update_df(
 		base_url+'voyage/caches',
@@ -76,10 +81,11 @@ def update_bar_graph(x_var,y_var,agg_mode):
 	Input('scatter_agg_mode', 'value'),
 	Input('scatter_x_vars', 'value'),
 	Input('scatter_y_vars', 'value'),
-	Input('scatter_factors', 'value')
+	Input('scatter_factors', 'value'),
+	Input('search_params', 'data')
 	)
 
-def update_scatter_graph(agg_mode,x_val,y_val,color_val):
+def update_scatter_graph(agg_mode,x_val,y_val,color_val,search_data):
 	global md
 	def agg_functions(x_val,y_val,agg_mode,df3):
 		if agg_mode=='Averages':
@@ -96,6 +102,10 @@ def update_scatter_graph(agg_mode,x_val,y_val,color_val):
 		'selected_fields':selected_fields,
 		'cachename':['voyage_xyscatter']
 	}
+	
+	search_data=json.loads(search_data)
+	for sdk in search_data:
+		data[sdk]=search_data[sdk]
 	
 	df=update_df(
 		base_url+'voyage/caches',
@@ -144,15 +154,20 @@ def update_scatter_graph(agg_mode,x_val,y_val,color_val):
 	Output('voyages-donut-graph', 'figure'),
 	Input('donut_sector_var', 'value'),
 	Input('donut_value_var', 'value'),
-	Input('donut_agg_mode','value')
+	Input('donut_agg_mode','value'),
+	Input('search_params', 'data')
 	)
-def donut_update_figure(sector_var,value_var,agg_mode):
+def donut_update_figure(sector_var,value_var,agg_mode,search_data):
 	global md
 	
 	data={
 		'selected_fields':[sector_var,value_var],
 		'cachename':['voyage_bar_and_donut_charts']
 	}
+	
+	search_data=json.loads(search_data)
+	for sdk in search_data:
+		data[sdk]=search_data[sdk]
 	
 	df=update_df(
 		base_url+'voyage/caches',
@@ -186,10 +201,13 @@ def donut_update_figure(sector_var,value_var,agg_mode):
 	Input('columns', 'value'),
 	Input('cells','value'),
 	Input('rmna','value'),
-	Input('valuefunction','value')
+	Input('valuefunction','value'),
+	Input('search_params', 'data')
 	)
-def pivot_table_update_figure(rows,columns,cells,rmna,valuefunction):
+def pivot_table_update_figure(rows,columns,cells,rmna,valuefunction,search_data):
 	global md
+	
+	search_data=json.loads(search_data)
 	
 	normalize=False
 	if valuefunction=="normalize_columns":
@@ -206,7 +224,10 @@ def pivot_table_update_figure(rows,columns,cells,rmna,valuefunction):
 		'value_field_tuple':[cells,valuefunction],
 		'cachename':['voyage_pivot_tables']
 	}
-	
+
+	for sdk in search_data:
+		data[sdk]=search_data[sdk]
+
 	df=update_df(
 		base_url+'voyage/groupby',
 		data=data
@@ -233,7 +254,6 @@ def pivot_table_update_figure(rows,columns,cells,rmna,valuefunction):
 ##https://github.com/JohnMulligan/voyages-api-leaflet
 ##https://dash-leaflet.herokuapp.com/
 
-
 @callback(
 	Output('tile-layer', 'url'),
 	Input('leaflet-map-tilesets-select','value')
@@ -246,12 +266,13 @@ gd=vd.main()
 
 @callback(
 	Output('routes-feature-layer', 'children'),
-	Input('map-dataset','value'),
-	Input('voyage_dates__imp_arrival_at_port_of_dis_yyyy-maps-slider','value')
+	Input('search_params', 'data')
 	)
-def get_leaflet_routes(dataset,yearam):
+def get_leaflet_routes(search_data):
 	global gd
 	global md
+	
+	search_data=json.loads(search_data)
 	
 	#with routes, the way those networks are currently built, we can really only do ports...
 	##Specifically,
@@ -263,11 +284,11 @@ def get_leaflet_routes(dataset,yearam):
 		'voyage_itinerary__imp_principal_port_slave_dis__id',
 		'voyage_itinerary__imp_principal_place_of_slave_purchase__id'
 		]
+	datasetnamemap={0:"trans",1:"intra"}
 	
 	#load the appropriate routes (different for transatlantic vs intraamerican)
-	datasetnamemap={0:"trans",1:"intra"}
-	port_routes=loadjson(os.path.join('static',datasetnamemap[dataset],'port_routes.json'))
-	regional_routes=loadjson(os.path.join('static',datasetnamemap[dataset],'regional_routes.json'))
+	port_routes=loadjson(os.path.join('static',datasetnamemap[search_data['dataset'][0]],'port_routes.json'))
+	regional_routes=loadjson(os.path.join('static',datasetnamemap[search_data['dataset'][0]],'regional_routes.json'))
 	
 	data={
 		'groupby_fields':groupby_fields,
@@ -276,19 +297,14 @@ def get_leaflet_routes(dataset,yearam):
 		'rmna':['All']
 	}
 	
-	##ADD SOME FILTERS:
+	for sdk in search_data:
+		data[sdk]=search_data[sdk]
 	
-	##ONLY VOYAGES IN THE YEAR RANGE
-	data['voyage_dates__imp_arrival_at_port_of_dis_yyyy']=yearam
 	
 	##ONLY LOCATIONS THAT SHOULD BE SHOWN ON THE MAP
 	for groupby_field in groupby_fields:
 		groupbyfield_showonmap_varname=re.sub("__id$","__show_on_map",groupby_field)
 		data[groupbyfield_showonmap_varname]=["True"]
-	
-	dataset=[dataset,dataset]
-	
-	data['dataset']=[dataset]
 	
 	r=requests.post(url=base_url+'voyage/groupby',headers=headers,data=data)
 	j=json.loads(r.text)
@@ -344,3 +360,23 @@ def get_leaflet_routes(dataset,yearam):
 	
 	return dl.GeoJSON(data=routes_featurecollection)
 
+##THIS TRANSLATES THE SEARCH INTERFACE COMPONENTS INTO A JSON QUERY OBJECT
+##WHICH WE WILL PASS INTO OUR DASHBOARD QUERIES
+@callback(
+	Output('search_params', 'data'),
+	Input('dataset-radio','value'),
+	Input('yearam-slider','value')
+	)
+def get_leaflet_tiles(dataset,yearam):
+	
+	search_params={}
+	
+	search_params['voyage_dates__imp_arrival_at_port_of_dis_yyyy']=yearam
+	
+	dataset=[dataset,dataset]
+	search_params['dataset']=dataset
+	
+	return json.dumps(search_params)
+
+import voyages_geo_to_geojson_points_dict as vd
+gd=vd.main()

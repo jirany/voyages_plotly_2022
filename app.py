@@ -3,6 +3,7 @@ import dash_bootstrap_components as dbc
 from layouts import *
 from vars import *
 import requests
+import re
 from callbacks import *
 import time
 import json
@@ -21,44 +22,43 @@ registered_apps=[
 ]
 
 app.layout =  dbc.Container(
-	[
-		dbc.Row([
-			dbc.Card([
-				dbc.Col(
-					html.Div([
-						html.Label('Select App'),
-							dcc.Dropdown(
-								id='app_selector',
-								options=[
-									{'label':i[1],'value':i[0]} for i in registered_apps],
-								value=registered_apps[0][0],
-								multi=False
-							),
-						html.Br()
-					])
-				)
-			])
-		]),
-		html.Hr(),
+	[	
+		dcc.Store(id="search_params"),
+		dcc.Location(id="url"),
 		dbc.Row([
 			dbc.Col(
-				html.Div(id='page-content'),
-			)
-		])
+			
+				get_navlinks(registered_apps),
+				width=2,xs=12,sm=12,md=2,lg=2,
+				style={"background-color": "#f8f9fa"}
+				
+			),
+			dbc.Col([
+			
+				dbc.Row([
+					search_pane
+				]),
+				html.Hr(),
+				dbc.Row([
+					dbc.Col(
+						html.Div(id='page-content'),
+					)
+				])
+			], width=10,xs=12,sm=12,md=10,lg=10),
+		]),
+			
 	]
 )
 
 @app.callback(
 	Output('page-content', 'children'),
-    Input('app_selector', 'value')
+    Input('url', 'pathname')
 )
 def display_page(selected_app_layout_name):
+	
+	selected_app_layout_name=re.sub("/","",selected_app_layout_name)
+	
 	return eval(selected_app_layout_name)
-
-
-
-
-
 
 
 if __name__ == '__main__':
