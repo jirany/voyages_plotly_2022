@@ -5,9 +5,11 @@ from app_secrets import *
 from dash import dcc
 import dash_bootstrap_components as dbc
 
-
+#overwrite flatlabels w custom flatlabels enumerated above
 r=requests.options(base_url+'voyage/?hierarchical=False',headers=headers)
 md=json.loads(r.text)
+for m in md2:
+	md[m]['flatlabel']=md2[m]
 
 def loadjson(fname):
 	d=open(fname,"r")

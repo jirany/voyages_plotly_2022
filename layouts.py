@@ -266,6 +266,44 @@ pivot_table_layout =  dbc.Container(
 	]
 )
 
+data_table =  dbc.Container(
+	[
+		dbc.Row([
+			dbc.Col(
+				html.Div([
+					"Show columns (\"*\" denotes imputed variables):",
+					dcc.Dropdown(
+						id="table-colselect",
+						multi=True,
+						options=[{'label':md[i]['flatlabel'],'value':i} for i in voyage_export_vars],
+						value=[i for i in voyage_table_default_vars]
+					),
+				]),
+			)
+		]),
+		dbc.Row([
+			dbc.Col(
+				dash_table.DataTable(
+					id='table-multicol-sorting',
+					columns=[],
+					page_current=0,
+					page_size=20,
+					page_action='custom',
+					sort_action='custom',
+					sort_mode='single',
+					style_cell={
+						'height': 'auto',
+						# all three widths are needed
+						'width': '100px', 'maxWidth': '180px',
+						'whiteSpace': 'normal'
+					}
+				)
+			)
+		])
+	]
+)
+
+
 
 leaflet_map =  dbc.Container(
 	[
@@ -309,7 +347,7 @@ leaflet_map =  dbc.Container(
 search_pane = dbc.Card([
 		html.H5("Search/Filters"),
 		dbc.Row([
-			dbc.Col(
+			dbc.Col([
 				html.Div([
 					html.Label('Dataset'),
 					dcc.RadioItems(
@@ -324,15 +362,41 @@ search_pane = dbc.Card([
 						labelStyle={'display': 'block'}
 					)
 				])
-			)
+			],width=5),
+			dbc.Col([html.Div([html.P('')])],width=5),
+			dbc.Col([
+				html.Div([
+					html.Label('Results Count:'),
+					html.P(id="search_pane_results_count")
+				])
+			],width=2)
 		]),
+		#Waiting on Dash 2.3.2
+		#dbc.Row([
+		#	dbc.Card([
+		#		html.H5("Search/Filters"),
+		#		dbc.Row([
+		#			dbc.Col(
+		#				html.Div([
+		#					"Multi dynamic Dropdown",
+		#					dcc.Dropdown(
+		#						id="my-multi-dynamic-dropdown",
+		#						multi=True,
+		#						options=[],
+		#						value=None
+		#					),
+		#				]),
+		#			)
+		#		])
+		#	])
+		#]),
 		dbc.Row([
+			html.Hr(),
 			dbc.Col(
 				html.Div([
-					html.Hr(),
 					html.Label('Voyage Year'),
 					get_rangeslider('voyage_dates__imp_arrival_at_port_of_dis_yyyy','yearam-slider')
-				])
+				]),width=12
 			)
 		])
 	])

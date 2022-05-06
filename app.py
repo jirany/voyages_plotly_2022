@@ -14,6 +14,7 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP],suppress_callba
 server = app.server
 
 registered_apps=[
+	["data_table","Data Table"],
 	["xyscatter_layout","Scatter and Timeline Graphs"],
 	["bar_layout","Bar Charts"],
 	["donut_layout","Donut Charts"],
@@ -27,7 +28,6 @@ app.layout =  dbc.Container(
 		dcc.Location(id="url"),
 		dbc.Row([
 			dbc.Col(
-			
 				get_navlinks(registered_apps),
 				width=2,xs=12,sm=12,md=2,lg=2,
 				style={"background-color": "#f8f9fa"}
@@ -47,7 +47,7 @@ app.layout =  dbc.Container(
 			], width=10,xs=12,sm=12,md=10,lg=10),
 		]),
 			
-	]
+	],fluid=True
 )
 
 @app.callback(
@@ -65,4 +65,4 @@ def display_page(selected_app_layout_name):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)

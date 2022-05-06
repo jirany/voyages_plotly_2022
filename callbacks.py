@@ -16,8 +16,13 @@ def update_df(url,data):
 	global headers
 	r=requests.post(url,data=data,headers=headers)
 	j=r.text
+	
+	try:
+		results_count=r.headers['results_count']
+	except:
+		results_count=None
 	df=pd.read_json(j)
-	return df
+	return df,results_count
 
 
 def labeltrim(s,threshold=15):
@@ -45,7 +50,7 @@ def update_bar_graph(x_var,y_var,agg_mode,search_data):
 	for sdk in search_data:
 		data[sdk]=search_data[sdk]
 	
-	df=update_df(
+	df,results_count=update_df(
 		base_url+'voyage/caches',
 		data=data
 	)
@@ -107,7 +112,7 @@ def update_scatter_graph(agg_mode,x_val,y_val,color_val,search_data):
 	for sdk in search_data:
 		data[sdk]=search_data[sdk]
 	
-	df=update_df(
+	df,results_count=update_df(
 		base_url+'voyage/caches',
 		data=data
 	)
@@ -169,7 +174,7 @@ def donut_update_figure(sector_var,value_var,agg_mode,search_data):
 	for sdk in search_data:
 		data[sdk]=search_data[sdk]
 	
-	df=update_df(
+	df,results_count=update_df(
 		base_url+'voyage/caches',
 		data=data
 	)
@@ -228,7 +233,7 @@ def pivot_table_update_figure(rows,columns,cells,rmna,valuefunction,search_data)
 	for sdk in search_data:
 		data[sdk]=search_data[sdk]
 
-	df=update_df(
+	df,results_count=update_df(
 		base_url+'voyage/groupby',
 		data=data
 	)
@@ -263,6 +268,65 @@ def get_leaflet_tiles(tileset_select):
 
 import voyages_geo_to_geojson_points_dict as vd
 gd=vd.main()
+
+
+
+
+@callback(
+    Output('table-multicol-sorting', "data"),
+    Output('table-multicol-sorting',"columns"),
+    Output('table-multicol-sorting',"page_count"),
+    Input('table-multicol-sorting', "page_current"),
+    Input('search_params', 'data'),
+	Input('table-colselect','value'),
+	Input('table-multicol-sorting','sort_by')
+)
+def update_table(page_current,search_data,colnames,sort_by):
+	if colnames == []:
+		raise PreventUpdate
+	
+	else:
+		global md
+		
+		results_per_page=20
+		
+		columns=[{"name": md[i]['flatlabel'], "id": i} for i in colnames]
+	
+		data={
+			'selected_fields':colnames,
+			'cachename':['voyage_export'],
+			'results_per_page':[results_per_page],
+			'results_page':[page_current+1]
+		}
+		sort_params=[]
+		if sort_by is not None:
+			for sb in sort_by:
+				direction=sb['direction']
+				colname=sb['column_id']
+				sign={'asc':'','desc':'-'}[direction]
+				sort_params.append(sign+colname)
+		data['order_by']=sort_params
+
+		search_data=json.loads(search_data)
+		for sdk in search_data:
+			data[sdk]=search_data[sdk]
+
+		df,results_count=update_df(
+			base_url+'voyage/caches',
+			data=data
+		)
+		
+		results_count=int(results_count)
+		results_per_page=int(results_per_page)
+		
+		page_count_int=int(results_count/results_per_page)
+
+		page_count_mod=results_count%results_per_page
+		
+		if page_count_mod !=0:
+			page_count_int+=1
+	
+		return df.to_dict('records'),columns,page_count_int
 
 @callback(
 	Output('routes-feature-layer', 'children'),
@@ -364,6 +428,7 @@ def get_leaflet_routes(search_data):
 ##WHICH WE WILL PASS INTO OUR DASHBOARD QUERIES
 @callback(
 	Output('search_params', 'data'),
+	Output('search_pane_results_count','children'),
 	Input('dataset-radio','value'),
 	Input('yearam-slider','value')
 	)
@@ -375,8 +440,44 @@ def get_leaflet_tiles(dataset,yearam):
 	
 	dataset=[dataset,dataset]
 	search_params['dataset']=dataset
-	
-	return json.dumps(search_params)
 
-import voyages_geo_to_geojson_points_dict as vd
-gd=vd.main()
+	data={
+		'selected_fields':['voyage_dates__imp_arrival_at_port_of_dis_yyyy'],
+		'cachename':['voyage_bar_and_donut_charts'],	
+	}
+	for sdk in search_params:
+		data[sdk]=search_params[sdk]
+	
+	df,results_count=update_df(
+		base_url+'voyage/caches',
+		data=data
+	)
+	
+	return json.dumps(search_params),results_count
+
+#from https://dash.plotly.com/dash-core-components/dropdown
+@callback(
+    Output("my-multi-dynamic-dropdown", "options"),
+	[Input("my-multi-dynamic-dropdown", "search_value"),
+	State("my-multi-dynamic-dropdown", "value")]
+)
+def update_multi_options(search_value, state_value):
+	
+	if search_value:
+		varname="voyage_captainconnection__captain__name"
+		data={varname: [search_value]}
+		r=requests.post(url=base_url+'voyage/autocomplete',headers=headers,data=data)
+		j=json.loads(r.text)
+		autocomplete_results=[
+			{"label":i,"value":i} for i in j[varname]
+		]
+	else:
+		autocomplete_results=[]
+	
+	if type(state_value)==list:
+		autocomplete_results+=[{"label":i,"value":i} for i in state_value]
+	elif type(state_value)==str:
+		autocomplete_results+=[{"label":i,"value":i} for i in [state_value]]
+	
+	return autocomplete_results
+
