@@ -432,7 +432,7 @@ def get_leaflet_routes(search_data):
 	Input('dataset-radio','value'),
 	Input('yearam-slider','value')
 	)
-def get_leaflet_tiles(dataset,yearam):
+def update_search_params(dataset,yearam):
 	
 	search_params={}
 	
