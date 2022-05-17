@@ -372,34 +372,35 @@ search_pane = dbc.Card([
 			],width=2)
 		]),
 		dbc.Row([
-			dbc.Card([
-				html.H5("Autocomplete Search"),
-				dbc.Row([
-					dbc.Col(
-						html.Div([
-							html.Label('Select text field to filter on'),
-							dcc.Dropdown(
-								id="autocomplete-field-selector",
-								multi=False,
-								options=[{'label':md[i]['flatlabel'],'value':i} for i in autocomplete_text_fields],
-								value=autocomplete_text_fields[0]
-							),
-							html.Label('Search for text field values'),
-							dcc.Dropdown(
-								id="my-multi-dynamic-dropdown",
-								multi=True,
-								options=[],
-								value=None
-							),
-						]),
-					)
-				])
+			html.Hr(),
+			html.H6("Autocomplete Search"),
+			dbc.Row([
+				dbc.Col(
+					html.Div([
+						html.Label('Select text field to filter on'),
+						dcc.Dropdown(
+							id="autocomplete-field-selector",
+							multi=False,
+							options=[{'label':md[i]['flatlabel'],'value':i} for i in autocomplete_text_fields],
+							value=autocomplete_text_fields[0]
+						),
+						html.Label('Search for text field values'),
+						dcc.Dropdown(
+							id="my-multi-dynamic-dropdown",
+							multi=True,
+							options=[],
+							value=None
+						),
+						html.Br()
+					]),
+				)
 			])
 		]),
 		dbc.Row([
 			html.Hr(),
 			dbc.Col(
 				html.Div([
+					html.H6("Numeric Range Search"),
 					html.Label('Select numeric field to filter on'),
 					html.Div([
 						dcc.Dropdown(
