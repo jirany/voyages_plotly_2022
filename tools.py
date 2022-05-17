@@ -34,6 +34,12 @@ def get_rangeslider(fq_varname,component_id):
 	component=dcc.RangeSlider(min=minval, max=maxval, marks=None, step=1, id=component_id, tooltip={"placement": "bottom", "always_visible": True})
 	return component
 
+def get_autocomplete_dropdown(component_id):
+	
+	component=dcc.Dropdown(id=component_id,multi=True,options=[],value=None)
+	
+	return component
+	
 def get_navlinks(registered_apps):
 	navlinks=[]
 	for ra in registered_apps:

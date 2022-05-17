@@ -385,12 +385,9 @@ search_pane = dbc.Card([
 							value=autocomplete_text_fields[0]
 						),
 						html.Label('Search for text field values'),
-						dcc.Dropdown(
-							id="my-multi-dynamic-dropdown",
-							multi=True,
-							options=[],
-							value=None
-						),
+						html.Div([
+							get_autocomplete_dropdown('my-multi-dynamic-dropdown')
+						],id="autocomplete-text-div"),
 						html.Br()
 					]),
 				)
