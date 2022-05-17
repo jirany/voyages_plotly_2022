@@ -176,6 +176,26 @@ voyage_export_vars=[
 	'voyage_shipownerconnection__owner__name'
 ]
 
+autocomplete_text_fields=[
+	'voyage_itinerary__imp_principal_region_slave_dis__region',
+	'voyage_itinerary__imp_principal_region_of_slave_purchase__region',
+	'voyage_ship__ship_name',
+	'voyage_ship__imputed_nationality__name',
+	'voyage_outcome__resistance__name',
+	'voyage_outcome__particular_outcome__name',
+	'voyage_shipownerconnection__owner__name',
+	'voyage_captainconnection__captain__name',
+	'voyage_sourceconnection__source__full_ref'
+]
+
+rangeslider_numeric_fields=[
+	'voyage_dates__imp_arrival_at_port_of_dis_yyyy',
+	'voyage_slaves_numbers__imp_total_num_slaves_embarked',
+	'voyage_slaves_numbers__imp_mortality_ratio',
+	'voyage_crew__crew_first_landing',
+	'voyage_dates__length_middle_passage_days'
+]
+
 map_tilesets=[
 	{"label":i[0],"value":i[1]} for i in [
 	["Modern Countries","https://api.mapbox.com/styles/v1/%s/tiles/{z}/{x}/{y}?access_token=%s" %("jcm10/cl2gmkgjt000014rstx5nmcj6",mapbox_access_token)],
@@ -186,6 +206,8 @@ map_tilesets=[
 #We're going to bridge this and have shortened labels in here where applicable
 md2={
 	'voyage_id':'Voyage ID',
+	'voyage_itinerary__imp_principal_region_slave_dis__region':'Principal Region of Disembarkation *',
+	'voyage_itinerary__imp_principal_region_of_slave_purchase__region':'Principal Region of Purchase *',
 	'voyage_captainconnection__captain__name':'Captain\'s name',
 	'voyage_crew__crew_died_complete_voyage':'Crew deaths during voyage',
 	'voyage_crew__crew_first_landing':'Crew at first landing of slaves',

@@ -12,6 +12,7 @@ from app_secrets import *
 from tools import *
 import dash_leaflet as dl
 
+
 def update_df(url,data):
 	global headers
 	r=requests.post(url,data=data,headers=headers)
@@ -430,19 +431,26 @@ def get_leaflet_routes(search_data):
 	Output('search_params', 'data'),
 	Output('search_pane_results_count','children'),
 	Input('dataset-radio','value'),
-	Input('yearam-slider','value')
+	Input('rangeslider-field-selector','value'),
+	Input('rangeslider-numeric-fields','value'),
+	Input('my-multi-dynamic-dropdown','value'),
+	Input("autocomplete-field-selector","value")
 	)
-def update_search_params(dataset,yearam):
+def update_search_params(dataset,rangeslider_field_name,rangeslider_range,autocomplete_values,autocomplete_field_name):
 	
 	search_params={}
 	
-	search_params['voyage_dates__imp_arrival_at_port_of_dis_yyyy']=yearam
+	search_params[rangeslider_field_name]=rangeslider_range
+	search_params[autocomplete_field_name]=autocomplete_values
 	
 	dataset=[dataset,dataset]
 	search_params['dataset']=dataset
-
+	
+	#maybe this should be improved ...
+	##currently one does currently need to specify a cache if you're going to hit the cache endpoint
+	##so here i'm arbitrarily using the bar + donut chart
 	data={
-		'selected_fields':['voyage_dates__imp_arrival_at_port_of_dis_yyyy'],
+		'selected_fields':[rangeslider_field_name],
 		'cachename':['voyage_bar_and_donut_charts'],	
 	}
 	for sdk in search_params:
@@ -455,16 +463,38 @@ def update_search_params(dataset,yearam):
 	
 	return json.dumps(search_params),results_count
 
+
+@callback(
+    Output("rangeslider-numeric-div", "children"),
+	[Input("rangeslider-field-selector", "value")]
+)
+def update_multi_options(rangeslider_field_name):
+	
+	return get_rangeslider(rangeslider_field_name,'rangeslider-numeric-fields')
+
+#clear values
+@callback(
+    Output("my-multi-dynamic-dropdown", "value"),
+    
+	[Input("autocomplete-field-selector", "value")]
+)
+def update_multi_options(autocomplete_field_name):
+	
+	return []
+
+
 #from https://dash.plotly.com/dash-core-components/dropdown
 @callback(
     Output("my-multi-dynamic-dropdown", "options"),
 	[Input("my-multi-dynamic-dropdown", "search_value"),
+	Input("autocomplete-field-selector","value"),
 	State("my-multi-dynamic-dropdown", "value")]
 )
-def update_multi_options(search_value, state_value):
+def update_multi_options(search_value, field_name,state_value):
 	
+	#only going to work with a single field for now
 	if search_value:
-		varname="voyage_captainconnection__captain__name"
+		varname=field_name
 		data={varname: [search_value]}
 		r=requests.post(url=base_url+'voyage/autocomplete',headers=headers,data=data)
 		j=json.loads(r.text)

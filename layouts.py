@@ -349,7 +349,7 @@ search_pane = dbc.Card([
 		dbc.Row([
 			dbc.Col([
 				html.Div([
-					html.Label('Dataset'),
+					html.Label('Select Dataset'),
 					dcc.RadioItems(
 						id='dataset-radio',
 						options=[{'label': i[0], 'value': i[1]} for i in 
@@ -371,31 +371,47 @@ search_pane = dbc.Card([
 				])
 			],width=2)
 		]),
-		#Waiting on Dash 2.3.2
-		#dbc.Row([
-		#	dbc.Card([
-		#		html.H5("Search/Filters"),
-		#		dbc.Row([
-		#			dbc.Col(
-		#				html.Div([
-		#					"Multi dynamic Dropdown",
-		#					dcc.Dropdown(
-		#						id="my-multi-dynamic-dropdown",
-		#						multi=True,
-		#						options=[],
-		#						value=None
-		#					),
-		#				]),
-		#			)
-		#		])
-		#	])
-		#]),
+		dbc.Row([
+			dbc.Card([
+				html.H5("Autocomplete Search"),
+				dbc.Row([
+					dbc.Col(
+						html.Div([
+							html.Label('Select text field to filter on'),
+							dcc.Dropdown(
+								id="autocomplete-field-selector",
+								multi=False,
+								options=[{'label':md[i]['flatlabel'],'value':i} for i in autocomplete_text_fields],
+								value=autocomplete_text_fields[0]
+							),
+							html.Label('Search for text field values'),
+							dcc.Dropdown(
+								id="my-multi-dynamic-dropdown",
+								multi=True,
+								options=[],
+								value=None
+							),
+						]),
+					)
+				])
+			])
+		]),
 		dbc.Row([
 			html.Hr(),
 			dbc.Col(
 				html.Div([
-					html.Label('Voyage Year'),
-					get_rangeslider('voyage_dates__imp_arrival_at_port_of_dis_yyyy','yearam-slider')
+					html.Label('Select numeric field to filter on'),
+					html.Div([
+						dcc.Dropdown(
+							id="rangeslider-field-selector",
+							multi=False,
+							options=[{'label':md[i]['flatlabel'],'value':i} for i in rangeslider_numeric_fields],
+							value=rangeslider_numeric_fields[0]
+						),
+					]),
+					html.Div([
+						get_rangeslider(rangeslider_numeric_fields[0],'rangeslider-numeric-fields')
+					],id="rangeslider-numeric-div")
 				]),width=12
 			)
 		])
