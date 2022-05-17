@@ -490,19 +490,17 @@ def update_multi_options(autocomplete_field_name):
 	Input("autocomplete-field-selector","value"),
 	State("my-multi-dynamic-dropdown", "value")]
 )
-def update_multi_options(search_value, field_name,state_value):
+def autocompletion(search_value, field_name,state_value):
 	
 	#only going to work with a single field for now
-	if search_value:
-		varname=field_name
-		data={varname: [search_value]}
-		r=requests.post(url=base_url+'voyage/autocomplete',headers=headers,data=data)
-		j=json.loads(r.text)
-		autocomplete_results=[
-			{"label":i,"value":i} for i in j[varname]
-		]
-	else:
-		autocomplete_results=[]
+	varname=field_name
+	data={varname: [search_value] if search_value else ['']}
+	r=requests.post(url=base_url+'voyage/autocomplete',headers=headers,data=data)
+	#print(r.text)
+	j=json.loads(r.text)
+	autocomplete_results=[
+		{"label":i,"value":i} for i in j[varname]
+	]
 	
 	if type(state_value)==list:
 		autocomplete_results+=[{"label":i,"value":i} for i in state_value]
