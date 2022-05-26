@@ -20,7 +20,7 @@ bar_layout =  dbc.Container(
 		dbc.Row([
 			dbc.Col(
 				html.Div(
-					[					
+					[
 						dbc.Card(
 							[dbc.Row(
 								[
@@ -33,7 +33,7 @@ bar_layout =  dbc.Container(
 													value=bar_x_vars[0],
 													multi=False
 												)
-											]),						
+											]),
 											width=12,xs=12,sm=12,md=12,lg=6
 										),
 										dbc.Col(
@@ -90,7 +90,7 @@ xyscatter_layout =  dbc.Container(
 											value=scatter_plot_x_vars[0],
 											multi=False
 										),
-									]),						
+									]),
 									width=9,xs=12,sm=12,md=9,lg=9
 							),
 							dbc.Col(
@@ -142,7 +142,6 @@ xyscatter_layout =  dbc.Container(
 	])
 	]
 )
-
 
 donut_layout =  dbc.Container(
 	[
@@ -199,9 +198,6 @@ donut_layout =  dbc.Container(
 		])
 	]
 )
-
-
-
 
 pivot_table_layout =  dbc.Container(
 	[
@@ -303,8 +299,6 @@ data_table =  dbc.Container(
 	]
 )
 
-
-
 leaflet_map =  dbc.Container(
 	[
 		dbc.Row([
@@ -352,7 +346,7 @@ search_pane = dbc.Card([
 					html.Label('Select Dataset'),
 					dcc.RadioItems(
 						id='dataset-radio',
-						options=[{'label': i[0], 'value': i[1]} for i in 
+						options=[{'label': i[0], 'value': i[1]} for i in
 								[
 									["Trans-Atlantic",0],
 									["Intra-American",1]
@@ -415,5 +409,61 @@ search_pane = dbc.Card([
 		])
 	])
 
-
-
+barcharttest =  dbc.Container(
+	[
+		dbc.Row([
+			dbc.Col(
+				html.Div(
+					[
+						dbc.Card(
+							[dbc.Row(
+								[
+									dbc.Col(
+											html.Div([
+												html.Label('X variables'),
+												dcc.Dropdown(
+													id='bar_x_vartest',
+													options=[{'label':md[i]['flatlabel'],'value':i} for i in bar_x_vars],
+													value=bar_x_vars[0],
+													multi=False
+												)
+											]),
+											width=12,xs=12,sm=12,md=12,lg=6
+										),
+										dbc.Col(
+											html.Div([
+												html.Label('Y variables'),
+												dcc.Dropdown(
+													id='bar_y_vartest',
+													options=[{'label':md[i]['flatlabel'],'value':i} for i in bar_y_abs_vars],
+													value=bar_y_abs_vars[0],
+													multi=False
+												),
+												html.Br(),
+												html.Label('Totals/Sums or Averages'),
+												dcc.RadioItems(
+													id='bar_agg_modetest',
+													options=[{'label': i, 'value': i} for i in ['Totals/Sums','Averages']],
+													value='Totals/Sums',
+													labelStyle={'display': 'inline'}
+												)
+											]),
+											width=12,xs=12,sm=12,md=12,lg=6
+										)
+								]
+							)]
+						)
+					]
+				)
+			),
+		]),
+		dbc.Row([
+			dbc.Col(
+				html.Div(
+					[dcc.Graph(id='voyages-bar-graphtest')]
+				),
+			),
+		]),
+	],
+	style={"height": "100vh"},
+)
