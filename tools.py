@@ -29,19 +29,20 @@ def get_rangeslider(fq_varname,component_id):
 	}
 	r=requests.post(url=base_url+"voyage/aggregations",headers=headers,data=data)
 	j=json.loads(r.text)
+
 	minval=j[fq_varname]['min']
 	maxval=j[fq_varname]['max']
 	component=dcc.RangeSlider(min=minval, max=maxval, marks=None, step=1, id=component_id, tooltip={"placement": "bottom", "always_visible": True})
 	return component
 
 def get_autocomplete_dropdown(component_id):
-	
+
 	component=dcc.Dropdown(id=component_id,multi=True,options=[],value=None)
-	
+
 	return component
-	
+
 def get_navlinks(registered_apps):
 	navlinks=[]
 	for ra in registered_apps:
 		navlinks.append(dbc.NavLink(ra[1], href=ra[0], active="exact"))
-	return navlinks		
+	return navlinks

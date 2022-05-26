@@ -19,11 +19,12 @@ registered_apps=[
 	["bar_layout","Bar Charts"],
 	["donut_layout","Donut Charts"],
 	["pivot_table_layout","Pivot Table Layout"],
-	["leaflet_map","Leaflet map (experimental)"]
+	["leaflet_map","Leaflet map (experimental)"],
+	["barcharttest", "barchart test"]
 ]
 
 app.layout =  dbc.Container(
-	[	
+	[
 		dcc.Store(id="search_params"),
 		dcc.Location(id="url"),
 		dbc.Row([
@@ -31,10 +32,10 @@ app.layout =  dbc.Container(
 				get_navlinks(registered_apps),
 				width=2,xs=12,sm=12,md=2,lg=2,
 				style={"background-color": "#f8f9fa"}
-				
+
 			),
 			dbc.Col([
-			
+
 				dbc.Row([
 					search_pane
 				]),
@@ -46,7 +47,7 @@ app.layout =  dbc.Container(
 				])
 			], width=10,xs=12,sm=12,md=10,lg=10),
 		]),
-			
+
 	],fluid=True
 )
 
@@ -55,12 +56,12 @@ app.layout =  dbc.Container(
     Input('url', 'pathname')
 )
 def display_page(selected_app_layout_name):
-	
+
 	selected_app_layout_name=re.sub("/","",selected_app_layout_name)
-	
+
 	if selected_app_layout_name not in [k[0] for k in registered_apps]:
 		selected_app_layout_name=registered_apps[0][0]
-	
+
 	return eval(selected_app_layout_name)
 
 
